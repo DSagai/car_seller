@@ -16,5 +16,7 @@
         <mapping class="sagai.dmytro.car.seller.model.authentication.User" package="sagai.dmytro.car.seller.model.authentication"/>
         <mapping class="sagai.dmytro.car.seller.model.authentication.SecurityRole" package="sagai.dmytro.car.seller.model.authentication"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.Advertisement" package="sagai.dmytro.car.seller.model.advertisements"/>
+        <mapping class="sagai.dmytro.car.seller.model.advertisements.Message" package="sagai.dmytro.car.seller.model.advertisements"/>
+        <mapping class="sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute" package="sagai.dmytro.car.seller.model.advertisements.attributes"/>
     </session-factory>
 </hibernate-configuration>

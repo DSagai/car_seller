@@ -2,16 +2,15 @@ package sagai.dmytro.car.seller.model.authentication;
 
 import java.util.List;
 
-import org.hibernate.annotations.Cascade;
 import sagai.dmytro.car.seller.model.advertisements.*;
 
 import javax.persistence.*;
 
 /**
- * TODO: add comments
+ * Entity class for purpose of user authentication.
  *
  * @author dsagai
- * @version TODO: set version
+ * @version 1.00
  * @since 19.04.2017
  */
 
@@ -52,6 +51,10 @@ public class User {
     @Basic
     @Column(name = "phone_number", nullable = false, length = 30)
     private String phoneNumber;
+
+    @Basic
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean enabled;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "advertisements", joinColumns = @JoinColumn(name = "owner_id"),
@@ -133,4 +136,36 @@ public class User {
         this.advertisements = advertisements;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

@@ -3,10 +3,11 @@ package sagai.dmytro.car.seller.model.authentication;
 import javax.persistence.*;
 
 /**
- * TODO: add comments
+ * Class represents entity item of collection of
+ * security roles
  *
  * @author dsagai
- * @version TODO: set version
+ * @version 1.00
  * @since 19.04.2017
  */
 @Entity
@@ -41,5 +42,31 @@ public class SecurityRole {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "SecurityRole{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SecurityRole role = (SecurityRole) o;
+
+        if (id != role.id) return false;
+        return name.equals(role.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        return result;
     }
 }

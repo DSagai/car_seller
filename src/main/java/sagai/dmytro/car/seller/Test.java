@@ -43,16 +43,17 @@ public class Test {
             user.setLogin("login");
             user.setPassword("password");
             user.setPhoneNumber("phone number");
-            List<Advertisement> advertisementList = Arrays.asList(new Advertisement("adv1"),
-                    new Advertisement("adv2"));
+//            List<Advertisement> advertisementList = Arrays.asList(new Advertisement("adv1"),
+//                    new Advertisement("adv2"));
 
-            session.save(user);
+
 
             //user.setAdvertisements(advertisementList);
-            for (Advertisement advertisement : advertisementList) {
-                advertisement.setOwner(user);
-                session.save(advertisement);
-            }
+            session.save(user);
+//            for (Advertisement advertisement : advertisementList) {
+//                advertisement.setOwner(user);
+//                session.save(advertisement);
+//            }
 
 
             transaction.commit();
