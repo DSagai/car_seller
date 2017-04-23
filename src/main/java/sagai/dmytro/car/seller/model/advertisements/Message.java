@@ -3,6 +3,7 @@ package sagai.dmytro.car.seller.model.advertisements;
 import sagai.dmytro.car.seller.model.authentication.User;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 /**
  * Entity class represents message item
@@ -25,8 +26,8 @@ public class Message {
     private String body;
 
     @Basic
-    @Column(nullable = false)
-    private long created;
+    @Column(nullable = false, columnDefinition = "timestamp")
+    private Timestamp created;
 
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -57,11 +58,11 @@ public class Message {
         this.body = body;
     }
 
-    public long getCreated() {
+    public Timestamp getCreated() {
         return created;
     }
 
-    public void setCreated(long created) {
+    public void setCreated(Timestamp created) {
         this.created = created;
     }
 

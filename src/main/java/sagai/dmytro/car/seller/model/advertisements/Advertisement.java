@@ -27,12 +27,12 @@ public class Advertisement {
     @JoinColumn(name = "owner_id", nullable = false, foreignKey = @ForeignKey(name = "OWNER_ID_FK"))
     private User owner;
 
-    @Basic(fetch = FetchType.LAZY)
+    @Basic
     @Column(name = "description", length = 1000)
     private String description;
 
     @Basic(fetch = FetchType.EAGER)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "timestamp")
     private Timestamp created;
 
 
@@ -56,31 +56,31 @@ public class Advertisement {
     @JoinColumn(foreignKey = @ForeignKey(name = "TRANSMISSION_ID_FK"), nullable = false)
     private AdvAttribute transmission;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(name = "model_name", length = 50, nullable = false)
     private String modelName;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(name = "engine_volume", nullable = false)
     private int engineVolume;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(name = "year_produced", nullable = false)
     private int yearOfProduction;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(nullable = false)
     private int odometer;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(name = "horse_powers")
     private int horsePowers;
 
-    @Basic(fetch = FetchType.LAZY)
-    @Column(length = 1 << 10)
-    private byte[] photo;
+    @Basic
+    @Column(length = 1 << 8, name = "sketch_photo")
+    private byte[] sketchPhoto;
 
-    @Basic(fetch = FetchType.EAGER)
+    @Basic
     @Column(name = "price", nullable = false)
     private float sellPrice;
 
@@ -88,6 +88,13 @@ public class Advertisement {
     @JoinTable(name = "messages", joinColumns = @JoinColumn(name = "advertisement_id"),
     inverseJoinColumns = @JoinColumn(name = "id"))
     private List<Message> messages;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "album", joinColumns = {@JoinColumn(name = "advertisement_id")},
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @ForeignKey(name = "ALBUM_ADV_ID_FK")
+    )
+    private List<AlbumItem> photoAlbum;
 
 
     public Advertisement() {
@@ -201,12 +208,12 @@ public class Advertisement {
         this.horsePowers = horsePowers;
     }
 
-    public byte[] getPhoto() {
-        return photo;
+    public byte[] getSketchPhoto() {
+        return sketchPhoto;
     }
 
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
+    public void setSketchPhoto(byte[] photo) {
+        this.sketchPhoto = photo;
     }
 
     public float getSellPrice() {

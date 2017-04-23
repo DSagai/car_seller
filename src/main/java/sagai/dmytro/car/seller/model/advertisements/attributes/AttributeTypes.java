@@ -12,6 +12,6 @@ public enum AttributeTypes {
     AdvertisementStatus,
     EngineType,
     CarBodyType,
-    Producer,
+    Manufacturer,
     Transmission
 }

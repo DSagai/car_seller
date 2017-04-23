@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import sagai.dmytro.car.seller.model.advertisements.Advertisement;
+import sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute;
 import sagai.dmytro.car.seller.model.authentication.SecurityRole;
 import sagai.dmytro.car.seller.model.authentication.User;
 
@@ -27,33 +28,34 @@ public class Test {
 
         Session session = factory.openSession();
         Transaction transaction = session.beginTransaction();
-        SecurityRole role = new SecurityRole("admin");
-
-        User user = new User();
+//        SecurityRole role = new SecurityRole("admin");
+//
+//        User user = new User();
 
 
         try {
 
-            session.save(role);
-            user.setRole(role);
-
-            user.setEmail("AA@sdd.dd");
-            user.setFirstName("first");
-            user.setLastName("last");
-            user.setLogin("login");
-            user.setPassword("password");
-            user.setPhoneNumber("phone number");
+//            session.save(role);
+//            user.setRole(role);
+//
+//            user.setEmail("AA@sdd.dd");
+//            user.setFirstName("first");
+//            user.setLastName("last");
+//            user.setLogin("login");
+//            user.setPassword("password");
+//            user.setPhoneNumber("phone number");
 //            List<Advertisement> advertisementList = Arrays.asList(new Advertisement("adv1"),
 //                    new Advertisement("adv2"));
 
 
 
             //user.setAdvertisements(advertisementList);
-            session.save(user);
+//            session.save(user);
 //            for (Advertisement advertisement : advertisementList) {
 //                advertisement.setOwner(user);
 //                session.save(advertisement);
 //            }
+            Advertisement advertisement = session.get(Advertisement.class, 1);
 
 
             transaction.commit();

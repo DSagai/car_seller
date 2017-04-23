@@ -18,5 +18,6 @@
         <mapping class="sagai.dmytro.car.seller.model.advertisements.Advertisement" package="sagai.dmytro.car.seller.model.advertisements"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.Message" package="sagai.dmytro.car.seller.model.advertisements"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute" package="sagai.dmytro.car.seller.model.advertisements.attributes"/>
+        <mapping class="sagai.dmytro.car.seller.model.advertisements.AlbumItem" package="sagai.dmytro.car.seller.model.advertisements"/>
     </session-factory>
 </hibernate-configuration>

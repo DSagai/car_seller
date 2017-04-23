@@ -20,6 +20,7 @@ public class AdvAttribute {
 
     @Basic
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private AttributeTypes type;
 
     @Basic
