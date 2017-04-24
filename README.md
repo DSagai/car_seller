@@ -1,5 +1,5 @@
 # car_seller
-web application for car trading
+Web application for car trading.
 This web application isn't a commercial project.
 It is only a training project to learn how to use Java EE tools
 for implementing web application.
