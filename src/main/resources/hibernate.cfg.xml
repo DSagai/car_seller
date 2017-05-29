@@ -9,12 +9,12 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/car_seller?useSSL=false</property>
+        <!--<property name="hibernate.connection.url">jdbc:mysql://localhost:4040/car_seller?useSSL=false</property>-->
         <property name="hibernate.connection.CharSet">utf8</property>
         <property name="hibernate.connection.characterEncoding">utf8</property>
         <property name="hibernate.connection.useUnicode">true</property>
 
         <mapping class="sagai.dmytro.car.seller.model.authentication.User" package="sagai.dmytro.car.seller.model.authentication"/>
-        <mapping class="sagai.dmytro.car.seller.model.authentication.SecurityRole" package="sagai.dmytro.car.seller.model.authentication"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.Advertisement" package="sagai.dmytro.car.seller.model.advertisements"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.Message" package="sagai.dmytro.car.seller.model.advertisements"/>
         <mapping class="sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute" package="sagai.dmytro.car.seller.model.advertisements.attributes"/>

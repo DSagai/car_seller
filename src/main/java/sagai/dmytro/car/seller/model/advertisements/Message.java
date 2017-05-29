@@ -30,12 +30,12 @@ public class Message {
     private Timestamp created;
 
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "advertisement_id", nullable = false, foreignKey = @ForeignKey(name = "ADV_ID_FK"))
     private Advertisement advertisement;
 
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "AUTHOR_ID_FK"))
     private User author;
 
@@ -95,5 +95,14 @@ public class Message {
     @Override
     public int hashCode() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", body='" + body + '\'' +
+                ", created=" + created +
+                '}';
     }
 }

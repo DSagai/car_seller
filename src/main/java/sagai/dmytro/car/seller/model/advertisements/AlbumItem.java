@@ -9,7 +9,8 @@ import javax.persistence.*;
  * @version 1.00
  * @since 23.04.2017
  */
-@Entity(name = "album")
+@Entity
+@Table(name = "album")
 public class AlbumItem {
 
     @Id
@@ -19,6 +20,10 @@ public class AlbumItem {
     @Basic
     @Column(length = 1 << 11)
     private byte[] photo;
+
+    @ManyToOne
+    @JoinColumn(name = "advertisement_id", nullable = false, foreignKey = @ForeignKey(name = "ALBUM_ADV_ID_FK"))
+    private Advertisement advertisement;
 
     public AlbumItem() {
     }
@@ -37,5 +42,13 @@ public class AlbumItem {
 
     public void setPhoto(byte[] photo) {
         this.photo = photo;
+    }
+
+    public Advertisement getAdvertisement() {
+        return advertisement;
+    }
+
+    public void setAdvertisement(Advertisement advertisement) {
+        this.advertisement = advertisement;
     }
 }

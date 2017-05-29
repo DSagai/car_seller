@@ -84,12 +84,12 @@ public class Advertisement {
     @Column(name = "price", nullable = false)
     private float sellPrice;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "messages", joinColumns = @JoinColumn(name = "advertisement_id"),
     inverseJoinColumns = @JoinColumn(name = "id"))
     private List<Message> messages;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "album", joinColumns = {@JoinColumn(name = "advertisement_id")},
             inverseJoinColumns = @JoinColumn(name = "id"),
             foreignKey = @ForeignKey(name = "ALBUM_ADV_ID_FK")

@@ -1,10 +1,15 @@
 package sagai.dmytro.car.seller.model.authentication;
 
-import java.util.List;
+import java.util.*;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import sagai.dmytro.car.seller.model.advertisements.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * Entity class for purpose of user authentication.
@@ -22,34 +27,52 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+
+    @Column(name = "uuid", columnDefinition = "binary(16)", nullable = false)
+    private UUID uuid;
+
     @Basic
-    @Column(nullable = false, length = 45)
-    private String login;
+    @Column(name = "username", nullable = false, length = 20)
+    @Size(min = 5, max = 20, message = "count of characters must be between 5 and 20")
+    @Pattern(regexp = "[A-Za-z0-9\\._-]++", message = "Illegal characters were found")
+    @NotNull(message = "This field could not be empty")
+    private String username;
 
 
     @Basic
     @Column(name = "password", nullable = false, length = 100)
+    @NotNull(message = "This field could not be empty")
     private String password;
 
     @Basic
-    @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "ROLE_ID_FK"))
-    private SecurityRole role;
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SecurityRole role = SecurityRole.ROLE_USER;
 
     @Basic
     @Column(name = "first_name", nullable = false, length = 80)
+    @Size(min = 3, max = 80, message = "count of characters must be between 3 and 80")
+    @Pattern(regexp = "[A-Za-z]++", message = "Illegal characters were found")
+    @NotNull(message = "This field could not be empty")
     private String firstName;
 
     @Basic
     @Column(name = "last_name", nullable = false, length = 80)
+    @Size(min = 3, max = 80, message = "count of characters must be between 3 and 80")
+    @Pattern(regexp = "[A-Za-z]++", message = "Illegal characters were found")
     private String lastName;
 
     @Basic
     @Column(nullable = false, unique = true, length = 100)
+    @Size(min = 5, max = 20, message = "count of characters must be between 5 and 20")
+    @Pattern(regexp = "^[(a-zA-Z-0-9-\\_\\+\\.)]+@[(a-z-A-z)]+(\\.[(a-zA-z)]{2,3}){1,2}$",
+            message = "Invalid email address")
+    @NotNull(message = "This field could not be empty")
     private String email;
 
     @Basic
     @Column(name = "phone_number", nullable = false, length = 30)
+    @Pattern(regexp = "[0-9]++", message = "only digits are allowed")
     private String phoneNumber;
 
     @Basic
@@ -124,12 +147,12 @@ public class User {
         return advertisements;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setAdvertisements(List<Advertisement> advertisements) {
@@ -144,11 +167,19 @@ public class User {
         this.enabled = enabled;
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", login='" + login + '\'' +
+                ", username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 '}';
@@ -168,4 +199,6 @@ public class User {
     public int hashCode() {
         return id;
     }
+
+
 }

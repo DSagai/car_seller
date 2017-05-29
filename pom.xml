@@ -16,8 +16,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <springframework.version>4.0.6.RELEASE</springframework.version>
-        <springsecurity.version>4.0.4.RELEASE</springsecurity.version>
+        <springsecurity.version>3.2.3.RELEASE</springsecurity.version>
+        <!--<springsecurity.version>4.0.4.RELEASE</springsecurity.version>-->
         <apache.tiles.version>2.2.2</apache.tiles.version>
+        <hibernate.version>5.2.5.Final</hibernate.version>
     </properties>
 
 
@@ -44,7 +46,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.2.5.Final</version>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -82,9 +84,16 @@
 
         <dependency>
             <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${springframework.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -129,25 +138,45 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.tiles</groupId>
-            <artifactId>tiles-extras</artifactId>
-            <version>${apache.tiles.version}</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.tiles</groupId>
-            <artifactId>tiles-jsp</artifactId>
-            <version>${apache.tiles.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tiles</groupId>
-            <artifactId>tiles-servlet</artifactId>
-            <version>${apache.tiles.version}</version>
-        </dependency>
+
+
+        <!--<dependency>-->
+            <!--<groupId>org.apache.tiles</groupId>-->
+            <!--<artifactId>tiles-extras</artifactId>-->
+            <!--<version>${apache.tiles.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.tiles</groupId>-->
+            <!--<artifactId>tiles-jsp</artifactId>-->
+            <!--<version>${apache.tiles.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.tiles</groupId>-->
+            <!--<artifactId>tiles-servlet</artifactId>-->
+            <!--<version>${apache.tiles.version}</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.3</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
         </dependency>
 
     </dependencies>

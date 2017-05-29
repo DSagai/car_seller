@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="loginService">
+            <security:password-encoder ref="passwordEncoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <bean id="passwordEncoder"
+          class="org.springframework.security.crypto.password.StandardPasswordEncoder">
+    </bean>
+    
+    <security:http use-expressions="true">
+        <security:intercept-url pattern="/add-user-form" access="permitAll"/>
+        <security:intercept-url pattern="/ADD_USER" access="permitAll"/>
+        <security:intercept-url pattern="/activate" access="permitAll"/>
+        <security:intercept-url pattern="/user-created" access="permitAll"/>
+        <security:intercept-url pattern="/login" access="permitAll"/>
+        <security:intercept-url pattern="/static/**" access="permitAll"/>
+        <security:intercept-url pattern="/" access="isAuthenticated()"/>
+        <security:intercept-url pattern="/adv-update-form" access="isAuthenticated()"/>
+        <security:intercept-url pattern="/**" access="denyAll"/>
+        <security:form-login login-page="/login" authentication-failure-url="/login?error=true"/>
+        <security:logout logout-url="/logout" logout-success-url="/login"/>
+        <security:remember-me key="carSeller"/>
+
+        <security:csrf />
+    </security:http>
+
+</beans>
