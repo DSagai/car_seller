@@ -1,10 +1,14 @@
 package sagai.dmytro.car.seller.model.advertisements;
 
 
+import org.hibernate.validator.constraints.Range;
 import sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute;
 import sagai.dmytro.car.seller.model.authentication.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -29,6 +33,7 @@ public class Advertisement {
 
     @Basic
     @Column(name = "description", length = 1000)
+    @Size(max = 1000, message = "count of characters must be less or equal 1000")
     private String description;
 
     @Basic(fetch = FetchType.EAGER)
@@ -56,20 +61,31 @@ public class Advertisement {
     @JoinColumn(foreignKey = @ForeignKey(name = "TRANSMISSION_ID_FK"), nullable = false)
     private AdvAttribute transmission;
 
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(foreignKey = @ForeignKey(name = "MANUFACTURER_ID_FK"), nullable = false)
+    private AdvAttribute manufacturer;
+
     @Basic
     @Column(name = "model_name", length = 50, nullable = false)
+    @NotNull(message = "This field could not be empty.")
+    @Size(max = 50, message = "count of characters must be less or equal 50")
     private String modelName;
 
     @Basic
     @Column(name = "engine_volume", nullable = false)
+    @NotNull(message = "This field could not be empty.")
     private int engineVolume;
 
     @Basic
     @Column(name = "year_produced", nullable = false)
+    @NotNull(message = "This field could not be empty.")
+    @Range(min = 1900, max = 2017, message = "value is out of allowed range between 1900 and 2050")
     private int yearOfProduction;
 
     @Basic
     @Column(nullable = false)
+    @NotNull(message = "This field could not be empty.")
     private int odometer;
 
     @Basic
@@ -82,6 +98,7 @@ public class Advertisement {
 
     @Basic
     @Column(name = "price", nullable = false)
+    @NotNull(message = "This field could not be empty.")
     private float sellPrice;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -222,6 +239,22 @@ public class Advertisement {
 
     public void setSellPrice(float sellPrice) {
         this.sellPrice = sellPrice;
+    }
+
+    public AdvAttribute getManufacturer() {
+        return manufacturer;
+    }
+
+    public List<AlbumItem> getPhotoAlbum() {
+        return photoAlbum;
+    }
+
+    public void setPhotoAlbum(List<AlbumItem> photoAlbum) {
+        this.photoAlbum = photoAlbum;
+    }
+
+    public void setManufacturer(AdvAttribute manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     public List<Message> getMessages() {

@@ -37,7 +37,7 @@ public class MessageRepositoryTest {
 
     @Test
     public void saveUpdateTest() throws Exception {
-        Advertisement advertisement = this.advertisementRepository.getAdvertisement().get(0);
+        Advertisement advertisement = this.advertisementRepository.getAdvertisements().get(0);
         Message message = new Message();
         message.setAdvertisement(advertisement);
         message.setBody("Hello");

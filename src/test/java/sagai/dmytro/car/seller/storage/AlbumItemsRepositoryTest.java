@@ -35,7 +35,7 @@ public class AlbumItemsRepositoryTest {
     @Test
     public void saveDeleteTest() throws Exception {
         AlbumItem albumItem = new AlbumItem();
-        Advertisement advertisement = this.advertisementRepository.getAdvertisement().get(0);
+        Advertisement advertisement = this.advertisementRepository.getAdvertisements().get(0);
         albumItem.setAdvertisement(advertisement);
 
         albumItem.setPhoto("Hello world".getBytes());

@@ -6,11 +6,6 @@
 
 </head>
 <body>
-<%--<script type="text/javascript">--%>
-    <%--$(document).ready(function () {--%>
-        <%--document.f.j_username.focus();--%>
-    <%--});--%>
-<%--</script>--%>
 
 <c:if test="${param.error != null }">
     <p class="error">Login failed. Check your login and password.</p>

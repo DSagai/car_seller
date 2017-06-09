@@ -87,7 +87,7 @@
         </table>
     </sf:form>
 
-    <div style="clear: both"></div>
+
     <p>
         <a href="${pageContext.request.contextPath}/login">Back to login
             page</a>

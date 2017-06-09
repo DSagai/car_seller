@@ -18,7 +18,7 @@ public class AlbumItem {
     private int id;
 
     @Basic
-    @Column(length = 1 << 11)
+    @Column(length = (1 << 24) - 1, nullable = false)
     private byte[] photo;
 
     @ManyToOne

@@ -25,14 +25,14 @@ public class AdvAttribute {
 
     @Basic
     @Column(name = "name", nullable = false)
-    private String Name;
+    private String name;
 
     public AdvAttribute() {
     }
 
     public AdvAttribute(AttributeTypes type, String name) {
         this.type = type;
-        Name = name;
+        this.name = name;
     }
 
     public int getId() {
@@ -52,11 +52,11 @@ public class AdvAttribute {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class AdvAttribute {
         return "AdvAttribute{" +
                 "id=" + id +
                 ", type=" + type +
-                ", Name='" + Name + '\'' +
+                ", name='" + name + '\'' +
                 '}';
     }
 
@@ -77,14 +77,14 @@ public class AdvAttribute {
 
         if (id != attribute.id) return false;
         if (type != attribute.type) return false;
-        return Name.equals(attribute.Name);
+        return name.equals(attribute.name);
     }
 
     @Override
     public int hashCode() {
         int result = id;
         result = 31 * result + type.hashCode();
-        result = 31 * result + Name.hashCode();
+        result = 31 * result + name.hashCode();
         return result;
     }
 

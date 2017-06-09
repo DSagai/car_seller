@@ -91,7 +91,7 @@ public class AdvertisementRepository {
         return result;
     }
 
-    public List<Advertisement> getAdvertisement() {
+    public List<Advertisement> getAdvertisements() {
         List<Advertisement> result = new ArrayList<>();
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -104,5 +104,21 @@ public class AdvertisementRepository {
             session.close();
         }
         return result;
+    }
+
+    public Advertisement getAdvertisement(int id) {
+        Advertisement advertisement = null;
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            advertisement = session.get(Advertisement.class, id);
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
+            session.close();
+        }
+        return advertisement;
     }
 }

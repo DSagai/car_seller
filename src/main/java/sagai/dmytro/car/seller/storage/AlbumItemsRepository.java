@@ -80,4 +80,20 @@ public class AlbumItemsRepository {
         }
         return result;
     }
+
+    public AlbumItem getAlbumItem(int id) {
+        AlbumItem albumItem = null;
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            albumItem = session.get(AlbumItem.class, id);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+        return albumItem;
+    }
 }

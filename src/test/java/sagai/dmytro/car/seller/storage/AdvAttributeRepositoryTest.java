@@ -65,4 +65,10 @@ public class AdvAttributeRepositoryTest {
 
         this.repository.removeAttribute(atr);
     }
+
+    @Test
+    public void getDefaultStatus() throws Exception {
+        AdvAttribute defaultStatus = this.repository.getDefaultStatus();
+        assert(defaultStatus != null);
+    }
 }

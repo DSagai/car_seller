@@ -24,6 +24,7 @@ import java.util.List;
 @Repository("advAttributeRepository")
 public class AdvAttributeRepository {
     private static final Logger LOGGER = Logger.getLogger(AdvAttributeRepository.class);
+    private static final String DEFAULT_STATUS_NAME = "draft";
 
     @Autowired
     @Named("sessionFactory")
@@ -72,6 +73,7 @@ public class AdvAttributeRepository {
         try {
             result = session.createQuery("from AdvAttribute a where a.type = :type")
                     .setParameter("type", type).list();
+            transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
             LOGGER.log(Level.INFO, e.getMessage());
@@ -79,5 +81,26 @@ public class AdvAttributeRepository {
             session.close();
         }
         return result;
+    }
+
+    public AdvAttribute getAttributeByName(String attributeName) {
+        AdvAttribute result = null;
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            result = (AdvAttribute) session.createQuery("from AdvAttribute a where a.name = :name")
+                    .setParameter("name", attributeName).getSingleResult();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            LOGGER.log(Level.INFO, e.getMessage());
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public AdvAttribute getDefaultStatus() {
+        return getAttributeByName(DEFAULT_STATUS_NAME);
     }
 }

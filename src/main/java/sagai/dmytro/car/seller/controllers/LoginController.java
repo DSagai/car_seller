@@ -35,19 +35,45 @@ public class LoginController {
     @Named("mailerService")
     private MailerService mailerService;
 
+    /**
+     * returns custom login page.
+     * @return
+     */
     @RequestMapping("/login")
     public String getLoginForm() {
         return "login";
     }
 
+    /**
+     * Method returns "add-user-form" view, which performs
+     * input of required data for new database user.
+     * @param model
+     * @return
+     */
     @RequestMapping("/add-user-form")
     public String getAddUserForm(Model model) {
         model.addAttribute("user", new User());
         return "new-user";
     }
 
+    /**
+     * Method saves new user in database.
+     * After user was saved, method sends
+     * email request for user activation.
+     * So the method also performs email address verification.
+     * @param request
+     * @param model
+     * @param user
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return "user-created" view if validation was successful. Otherwise returns "new-user" form with validation
+     * errors captured.
+     * @throws MessagingException
+     */
     @RequestMapping("/ADD_USER")
-    public String addUser(HttpServletRequest request, Model model, @Valid @ModelAttribute User user, BindingResult bindingResult,
+    public String addUser(HttpServletRequest request, Model model,
+                          @Valid @ModelAttribute User user,
+                          BindingResult bindingResult,
                           RedirectAttributes redirectAttributes) throws MessagingException {
         if (bindingResult.hasErrors()) {
             return  "new-user";
@@ -70,11 +96,22 @@ public class LoginController {
         return ("redirect:user-created");
     }
 
+    /**
+     * Method returns "user-created" view, which informs that new
+     * database user was successfully created.
+     * @return
+     */
     @RequestMapping("/user-created")
     public String getUserCreated() {
         return "user-created";
     }
 
+    /**
+     * Method ac
+     * @param model
+     * @param uuid
+     * @return
+     */
     @RequestMapping("/activate")
     public String activateUser(Model model, @RequestParam(value = "uuid") UUID uuid) {
         String result = "";

@@ -9,7 +9,10 @@
 </head>
 <body>
 <div class="error">
+
+        <p class="error">${message}</p>
     <h4>Database access error occurred. Please try again later</h4>
+
 </div>
 </body>
 </html>
