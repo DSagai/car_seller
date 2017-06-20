@@ -27,7 +27,7 @@ public class Advertisement {
     private int id;
 
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false, foreignKey = @ForeignKey(name = "OWNER_ID_FK"))
     private User owner;
 
@@ -92,9 +92,10 @@ public class Advertisement {
     @Column(name = "horse_powers")
     private int horsePowers;
 
-    @Basic
-    @Column(length = 1 << 8, name = "sketch_photo")
-    private byte[] sketchPhoto;
+//    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+//    @JoinTable(name = "album", joinColumns = {@JoinColumn(name = "advertisement_id")},
+//    inverseJoinColumns = @JoinColumn(name = "id"))
+//    private AlbumItem sketchPhoto;
 
     @Basic
     @Column(name = "price", nullable = false)
@@ -105,14 +106,7 @@ public class Advertisement {
     @JoinTable(name = "messages", joinColumns = @JoinColumn(name = "advertisement_id"),
     inverseJoinColumns = @JoinColumn(name = "id"))
     private List<Message> messages;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(name = "album", joinColumns = {@JoinColumn(name = "advertisement_id")},
-            inverseJoinColumns = @JoinColumn(name = "id"),
-            foreignKey = @ForeignKey(name = "ALBUM_ADV_ID_FK")
-    )
-    private List<AlbumItem> photoAlbum;
-
+    
 
     public Advertisement() {
     }
@@ -225,13 +219,13 @@ public class Advertisement {
         this.horsePowers = horsePowers;
     }
 
-    public byte[] getSketchPhoto() {
-        return sketchPhoto;
-    }
-
-    public void setSketchPhoto(byte[] photo) {
-        this.sketchPhoto = photo;
-    }
+//    public AlbumItem getSketchPhoto() {
+//        return sketchPhoto;
+//    }
+//
+//    public void setSketchPhoto(AlbumItem photo) {
+//        this.sketchPhoto = photo;
+//    }
 
     public float getSellPrice() {
         return sellPrice;
@@ -245,13 +239,6 @@ public class Advertisement {
         return manufacturer;
     }
 
-    public List<AlbumItem> getPhotoAlbum() {
-        return photoAlbum;
-    }
-
-    public void setPhotoAlbum(List<AlbumItem> photoAlbum) {
-        this.photoAlbum = photoAlbum;
-    }
 
     public void setManufacturer(AdvAttribute manufacturer) {
         this.manufacturer = manufacturer;

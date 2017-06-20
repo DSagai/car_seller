@@ -4,7 +4,9 @@ package sagai.dmytro.car.seller.controllers;
 
 import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,7 @@ import sagai.dmytro.car.seller.storage.AdvAttributeRepository;
 import sagai.dmytro.car.seller.storage.AdvertisementRepository;
 import sagai.dmytro.car.seller.storage.AlbumItemsRepository;
 import sagai.dmytro.car.seller.storage.UserRepository;
+import sagai.dmytro.car.seller.utility.ImageConverterService;
 
 
 import javax.inject.Named;
@@ -65,6 +68,10 @@ public class MainController {
     @Named("albumItemsRepository")
     private AlbumItemsRepository albumItemsRepository;
 
+    @Autowired
+    @Named("imageConverterService")
+    private ImageConverterService imageConverterService;
+
     @RequestMapping("/")
     public String advertisementList() {
         return "adv-list";
@@ -76,20 +83,41 @@ public class MainController {
         return "file-upload-test";
     }
 
+
+    /**
+     * todo comments
+     * @param picture
+
+     * @return
+     * @throws IOException
+     * @throws FileUploadException
+     */
     @RequestMapping(value = "/upload-file",
             consumes = "multipart/form-data",
             method = RequestMethod.POST)
-    public String uploadFile(@RequestPart("picture") MultipartFile picture) throws IOException, FileUploadException {
 
+    public ResponseEntity<Integer> uploadFile(@RequestPart("picture") MultipartFile picture,
+                                              @RequestParam int id
+    ) throws IOException, FileUploadException {
 
-        if (picture != null){
-            Advertisement advertisement = this.advertisementRepository.getAdvertisement(5);
+        int body = 0;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+        try {
+            Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
             AlbumItem albumItem = new AlbumItem();
             albumItem.setAdvertisement(advertisement);
-            albumItem.setPhoto(picture.getBytes());
+            albumItem.setPhoto(this.imageConverterService.getResizedImage(
+                    ImageConverterService.StandardVerticalDimensions.Large,
+                    picture.getBytes()));
             this.albumItemsRepository.saveUpdateAlbumItem(albumItem);
+            body = albumItem.getId();
+            httpStatus = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return "login";
+
+        return new ResponseEntity<Integer>(body, httpStatus);
     }
 
     @RequestMapping("/add-advertisement-form")
@@ -137,27 +165,48 @@ public class MainController {
         mv.addObject("transmission",
                 this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
         mv.addObject("advertisement", advertisement);
-
-        List<AlbumItem> images = this.albumItemsRepository.getAlbumItems(advertisement);
-        mv.addObject("images", images);
         return mv;
     }
 
-    @RequestMapping(value = "/sketchPhoto.jpg", method = RequestMethod.GET)
-    public @ResponseBody byte[] getSketchPhoto(@RequestParam int id) throws IOException {
-        Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
-        byte[] result = null;
-        if (advertisement != null) {
-            if (advertisement.getSketchPhoto() != null && advertisement.getSketchPhoto().length > 0) {
-                result = advertisement.getSketchPhoto();
-            } else {
-                InputStream in = this.servletContext.getResourceAsStream(String.format(RESOURCE_PATH, "NA.jpg"));
-                result = new byte[in.available()];
-                in.read(result);
-            }
+    @RequestMapping(value = "/get-images-list", method = RequestMethod.POST)
+    @ResponseBody
+    public int[] getImagesList(@ModelAttribute Advertisement advertisement) {
+        List<AlbumItem> albumItems = this.albumItemsRepository.getAlbumItems(advertisement);
+        int[] result = new int[albumItems.size()];
+        for (int i = 0; i < albumItems.size(); i++){
+            result[i] = albumItems.get(i).getId();
         }
         return result;
     }
+
+
+    /**
+     * todo
+     * @return
+     */
+    @RequestMapping("/UPDATE-ADVERTISEMENT")
+    public String updateAdvertisement(@ModelAttribute Advertisement advertisement,
+                                      RedirectAttributes attributes) {
+        this.advertisementRepository.saveUpdateAdvertisement(advertisement);
+        attributes.addAttribute("advId", advertisement.getId());
+        return "redirect:/update-advertisement-form";
+    }
+
+//    @RequestMapping(value = "/sketchPhoto.jpg", method = RequestMethod.GET)
+//    public @ResponseBody byte[] getSketchPhoto(@RequestParam int id) throws IOException {
+//        Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
+//        byte[] result = null;
+//        if (advertisement != null) {
+//            if (advertisement.getSketchPhoto() != null) {
+//                result = advertisement.getSketchPhoto().getPhoto();
+//            } else {
+//                InputStream in = this.servletContext.getResourceAsStream(String.format(RESOURCE_PATH, "NA.jpg"));
+//                result = new byte[in.available()];
+//                in.read(result);
+//            }
+//        }
+//        return result;
+//    }
 
     @RequestMapping(value = "/albumPhoto.jpg", method = RequestMethod.GET)
     @ResponseBody
@@ -169,6 +218,24 @@ public class MainController {
         }
         return result;
     }
+
+
+    @RequestMapping(value = "/remove-album-item", method = RequestMethod.POST)
+    public ResponseEntity<Integer> removeAlbumItem(@ModelAttribute AlbumItem albumItem) {
+        int body = 0;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        try {
+            this.albumItemsRepository.removeAlbumItem(albumItem);
+            body = albumItem.getId();
+            httpStatus = HttpStatus.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<Integer>(body, httpStatus);
+    }
+
+
 }
 
 

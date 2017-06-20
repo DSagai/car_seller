@@ -51,4 +51,19 @@ public class AlbumItem {
     public void setAdvertisement(Advertisement advertisement) {
         this.advertisement = advertisement;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AlbumItem albumItem = (AlbumItem) o;
+
+        return id == albumItem.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

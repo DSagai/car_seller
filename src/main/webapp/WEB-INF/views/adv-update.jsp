@@ -7,20 +7,18 @@
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="static/css/main.css?v=<?=time();?"/>
     <link rel="stylesheet" type="text/css" href="static/css/w3.css?v=<?=time();?"/>
-    <script type="text/javascript" src="static/scripts/slideShow.js?v=<?=time();?"></script>
+    <script type="text/javascript" src="static/scripts/updatePageScript.js?v=<?=time();?"></script>
 
 </head>
 <body onload="init()">
 
-<img src="${pageContext.request.contextPath}/sketchPhoto.jpg?id=${advertisement.id}"/>
-
+<%--<img src="${pageContext.request.contextPath}/sketchPhoto.jpg?id=${advertisement.id}"/>--%>
+<input id="fileUploader" type="file" accept="image/jpeg" advId="${advertisement.id}">
 <br>
-<div class="w3-content w3-display-container">
-    <c:forEach items="${images}" var="item">
-        <img src="${pageContext.request.contextPath}/albumPhoto.jpg?id=${item.id}" class="albumItem">
-    </c:forEach>
-    <button onclick="putNextImage(-1)" class="w3-button w3-black w3-display-left">&#10094;</button>
-    <button onclick="putNextImage(1)" class="w3-button w3-black w3-display-right">&#10095;</button>
+<div id="imageContainer" class="w3-content w3-display-container">
+
+    <button onclick="iterateNextImage(-1)" class="w3-button w3-black w3-display-left">&#10094;</button>
+    <button onclick="iterateNextImage(1)" class="w3-button w3-black w3-display-right">&#10095;</button>
 </div>
 
 
@@ -28,7 +26,10 @@
 <div id="container">
     <sf:form id="adv-add-form" action="${pageContext.request.contextPath}/UPDATE-ADVERTISEMENT"
              commandName="advertisement" method="post">
-
+        <sf:input path="id" type="hidden"/>
+        <sf:input path="owner.id" type="hidden"/>
+        <sf:input path="status.id" type="hidden"/>
+        <sf:input path="created" type="hidden"/>
         <table>
             <tr>
                 <td colspan="2">Enter car details</td>
