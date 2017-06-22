@@ -24,12 +24,11 @@
         <security:intercept-url pattern="/user-created" access="permitAll"/>
         <security:intercept-url pattern="/login" access="permitAll"/>
         <security:intercept-url pattern="/static/**" access="permitAll"/>
-        <security:intercept-url pattern="/sketchPhoto.jpg" access="permitAll"/>
-        <security:intercept-url pattern="/albumPhoto.jpg" access="permitAll"/>
-        <security:intercept-url pattern="/get-images-list" access="permitAll"/>
+        <!--<security:intercept-url pattern="/sketchPhoto.jpg" access="permitAll"/>-->
+        <security:intercept-url pattern="/albumItem.jpg" access="permitAll"/>
+        <security:intercept-url pattern="/get-album-list" access="permitAll"/>
 
-        <security:intercept-url pattern="/add-file-form" access="permitAll"/>
-        <security:intercept-url pattern="/upload-file" access="permitAll"/>
+        <security:intercept-url pattern="/upload-album-item" access="permitAll"/>
 
         <security:intercept-url pattern="/" access="isAuthenticated()"/>
         <security:intercept-url pattern="/add-advertisement-form" access="isAuthenticated()"/>

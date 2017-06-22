@@ -106,7 +106,7 @@ public class Advertisement {
     @JoinTable(name = "messages", joinColumns = @JoinColumn(name = "advertisement_id"),
     inverseJoinColumns = @JoinColumn(name = "id"))
     private List<Message> messages;
-    
+
 
     public Advertisement() {
     }

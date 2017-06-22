@@ -5,10 +5,8 @@ package sagai.dmytro.car.seller.controllers;
 import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sagai.dmytro.car.seller.model.advertisements.Advertisement;
 import sagai.dmytro.car.seller.model.advertisements.AlbumItem;
-import sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute;
 import sagai.dmytro.car.seller.model.advertisements.attributes.AttributeTypes;
 import sagai.dmytro.car.seller.storage.AdvAttributeRepository;
 import sagai.dmytro.car.seller.storage.AdvertisementRepository;
@@ -27,11 +24,7 @@ import sagai.dmytro.car.seller.utility.ImageConverterService;
 
 import javax.inject.Named;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.List;
@@ -92,11 +85,11 @@ public class MainController {
      * @throws IOException
      * @throws FileUploadException
      */
-    @RequestMapping(value = "/upload-file",
+    @RequestMapping(value = "/upload-album-item",
             consumes = "multipart/form-data",
             method = RequestMethod.POST)
 
-    public ResponseEntity<Integer> uploadFile(@RequestPart("picture") MultipartFile picture,
+    public ResponseEntity<Integer> uploadAlbumItem(@RequestPart("picture") MultipartFile picture,
                                               @RequestParam int id
     ) throws IOException, FileUploadException {
 
@@ -168,9 +161,9 @@ public class MainController {
         return mv;
     }
 
-    @RequestMapping(value = "/get-images-list", method = RequestMethod.POST)
+    @RequestMapping(value = "/get-album-list", method = RequestMethod.POST)
     @ResponseBody
-    public int[] getImagesList(@ModelAttribute Advertisement advertisement) {
+    public int[] getAlbumList(@ModelAttribute Advertisement advertisement) {
         List<AlbumItem> albumItems = this.albumItemsRepository.getAlbumItems(advertisement);
         int[] result = new int[albumItems.size()];
         for (int i = 0; i < albumItems.size(); i++){
@@ -208,9 +201,9 @@ public class MainController {
 //        return result;
 //    }
 
-    @RequestMapping(value = "/albumPhoto.jpg", method = RequestMethod.GET)
+    @RequestMapping(value = "/albumItem.jpg", method = RequestMethod.GET)
     @ResponseBody
-    public byte[] getAlbumPhoto(@RequestParam int id) {
+    public byte[] getAlbumItem(@RequestParam int id) {
         AlbumItem albumItem = this.albumItemsRepository.getAlbumItem(id);
         byte[] result = null;
         if (albumItem != null) {

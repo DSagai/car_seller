@@ -31,7 +31,7 @@ function addImageLink(id) {
     var div = document.createElement("div");
     var delButton = document.createElement("button");
 
-    img.setAttribute("src","albumPhoto.jpg?id=" + id);
+    img.setAttribute("src","albumItem.jpg?id=" + id);
 
     delButton.setAttribute("imgId", id);
     delButton.setAttribute("onClick", "removeImageClick(this)");
@@ -105,7 +105,7 @@ function initRequest() {
  * albumItems connected to the current advertisement.
  */
 function loadImageListRequest() {
-    var url = "get-images-list";
+    var url = "get-album-list";
     var params = "id=" + advId + "&_csrf=" + csrf;
     req = initRequest();
     req.open("post", url, true);
@@ -133,7 +133,7 @@ function removeImageRequest(id) {
  * @param event - change of input file element.
  */
 function addImageRequest(event) {
-    var url = "upload-file";
+    var url = "upload-album-item";
     var file = event.target.files[0];
     req = initRequest();
     var data = new FormData();
