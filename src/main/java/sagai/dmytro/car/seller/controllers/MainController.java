@@ -6,6 +6,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sagai.dmytro.car.seller.model.advertisements.Advertisement;
 import sagai.dmytro.car.seller.model.advertisements.AlbumItem;
 import sagai.dmytro.car.seller.model.advertisements.attributes.AttributeTypes;
+import sagai.dmytro.car.seller.model.authentication.User;
 import sagai.dmytro.car.seller.storage.AdvAttributeRepository;
 import sagai.dmytro.car.seller.storage.AdvertisementRepository;
 import sagai.dmytro.car.seller.storage.AlbumItemsRepository;
@@ -90,7 +92,7 @@ public class MainController {
             method = RequestMethod.POST)
 
     public ResponseEntity<Integer> uploadAlbumItem(@RequestPart("picture") MultipartFile picture,
-                                              @RequestParam int id
+                                              @RequestParam int id, Principal login
     ) throws IOException, FileUploadException {
 
         int body = 0;
@@ -98,6 +100,7 @@ public class MainController {
 
         try {
             Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
+            checkOwnership(advertisement.getOwner(), login);
             AlbumItem albumItem = new AlbumItem();
             albumItem.setAdvertisement(advertisement);
             albumItem.setPhoto(this.imageConverterService.getResizedImage(
@@ -146,9 +149,12 @@ public class MainController {
     }
 
     @RequestMapping(value = "/update-advertisement-form")
-    public ModelAndView getUpdateAdvForm(@RequestParam int advId) {
+    public ModelAndView getUpdateAdvForm(@RequestParam int advId, Principal login) {
         ModelAndView mv = new ModelAndView("adv-update");
         Advertisement advertisement = this.advertisementRepository.getAdvertisement(advId);
+
+        checkOwnership(advertisement.getOwner(), login);
+
         mv.addObject("manufacturerList",
                 this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
         mv.addObject("engineType",
@@ -163,13 +169,8 @@ public class MainController {
 
     @RequestMapping(value = "/get-album-list", method = RequestMethod.POST)
     @ResponseBody
-    public int[] getAlbumList(@ModelAttribute Advertisement advertisement) {
-        List<AlbumItem> albumItems = this.albumItemsRepository.getAlbumItems(advertisement);
-        int[] result = new int[albumItems.size()];
-        for (int i = 0; i < albumItems.size(); i++){
-            result[i] = albumItems.get(i).getId();
-        }
-        return result;
+    public Integer[] getAlbumList(@ModelAttribute Advertisement advertisement) {
+        return this.albumItemsRepository.getAlbumItemIdArray(advertisement);
     }
 
 
@@ -179,7 +180,8 @@ public class MainController {
      */
     @RequestMapping("/UPDATE-ADVERTISEMENT")
     public String updateAdvertisement(@ModelAttribute Advertisement advertisement,
-                                      RedirectAttributes attributes) {
+                                      RedirectAttributes attributes, Principal login) {
+        checkOwnership(this.userRepository.getUser(advertisement.getOwner().getId()), login);
         this.advertisementRepository.saveUpdateAdvertisement(advertisement);
         attributes.addAttribute("advId", advertisement.getId());
         return "redirect:/update-advertisement-form";
@@ -214,10 +216,12 @@ public class MainController {
 
 
     @RequestMapping(value = "/remove-album-item", method = RequestMethod.POST)
-    public ResponseEntity<Integer> removeAlbumItem(@ModelAttribute AlbumItem albumItem) {
+    public ResponseEntity<Integer> removeAlbumItem(@RequestParam int id, Principal login) {
         int body = 0;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         try {
+            AlbumItem albumItem = this.albumItemsRepository.getAlbumItem(id);
+            checkOwnership(albumItem.getAdvertisement().getOwner(), login);
             this.albumItemsRepository.removeAlbumItem(albumItem);
             body = albumItem.getId();
             httpStatus = HttpStatus.OK;
@@ -228,6 +232,30 @@ public class MainController {
         return new ResponseEntity<Integer>(body, httpStatus);
     }
 
+
+    /**
+     * Method checks is current session login creator of requested resource.
+     * If not, then exception AccessDeniedException will be thrown.
+     * @param owner User.
+     * @param login Principal.
+     */
+    private void checkOwnership(User owner, Principal login) {
+        if (!owner.getUsername().equals(login.getName())) {
+            throw new AccessDeniedException(
+                    String.format("User %s have no rights to perform requested action!", login.getName())
+            );
+        }
+    }
+
+
+    @RequestMapping("/view-adv-form")
+    public ModelAndView getViewAdvForm(@RequestParam int id) {
+        ModelAndView mv = new ModelAndView("adv-view");
+        Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
+        mv.addObject("advertisement", advertisement);
+        mv.addObject("albumItems", this.albumItemsRepository.getAlbumItemIdArray(advertisement));
+        return mv;
+    }
 
 }
 

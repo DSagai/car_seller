@@ -10,6 +10,7 @@ import sagai.dmytro.car.seller.model.advertisements.AlbumItem;
 
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,13 +29,6 @@ public class AlbumItemsRepository {
     public AlbumItemsRepository() {
     }
 
-    public SessionFactory getFactory() {
-        return factory;
-    }
-
-    public void setFactory(SessionFactory factory) {
-        this.factory = factory;
-    }
 
     public void saveUpdateAlbumItem(AlbumItem albumItem) {
         Session session = this.factory.openSession();
@@ -68,10 +62,28 @@ public class AlbumItemsRepository {
         List<AlbumItem> result = new ArrayList<>();
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
-        try{
+        try {
             result = session.createQuery("from AlbumItem where advertisement = :adv")
                     .setParameter("adv", advertisement).list();
             transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return result;
+    }
+
+    public Integer[] getAlbumItemIdArray(Advertisement advertisement) {
+        Integer[] result = null;
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            List<Integer> resultSet = session.createQuery("select id from AlbumItem a where a.advertisement = :adv")
+                    .setParameter("adv", advertisement).list();
+            transaction.commit();
+            result = resultSet.toArray(new Integer[resultSet.size()]);
         } catch (Exception e) {
             transaction.rollback();
             e.printStackTrace();
