@@ -1,5 +1,7 @@
 package sagai.dmytro.car.seller.utility;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -19,16 +21,18 @@ import java.io.IOException;
  */
 @Component("imageConverterService")
 public class ImageConverterService {
-
+    private static final Logger LOGGER = Logger.getLogger(ImageConverterService.class);
     /**
      * method returns resized image converted into JPG format.
      * Aspect ratio is preserved.
      * @param size StandardVerticalDimensions size of vertical dimension.
      * @param in byte[]
      * @return byte[]
+     * @throws UtilityServiceException
      */
-    public byte[] getResizedImage(StandardVerticalDimensions size, byte[] in) throws IOException {
+    public byte[] getResizedImage(StandardVerticalDimensions size, byte[] in) throws UtilityServiceException {
         final String OUTPUT_FORMAT = "JPG";
+
         return getResizedImage(size, in, OUTPUT_FORMAT);
     }
 
@@ -39,17 +43,24 @@ public class ImageConverterService {
      * @param in
      * @param format
      * @return
-     * @throws IOException
+     * @throws UtilityServiceException
      */
-    public byte[] getResizedImage(StandardVerticalDimensions size, byte[] in, String format) throws IOException {
+    public byte[] getResizedImage(StandardVerticalDimensions size, byte[] in, String format)
+            throws UtilityServiceException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(in);
-        BufferedImage originalImage = ImageIO.read(byteArrayInputStream);
-        int horizontalSize = (int)((float)originalImage.getWidth()/originalImage.getHeight() * size.getPixels());
+        try {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(in);
+            BufferedImage originalImage = ImageIO.read(byteArrayInputStream);
+            int horizontalSize = (int) ((float) originalImage.getWidth() / originalImage.getHeight() * size
+                    .getPixels());
 
-        BufferedImage resizedImage = getResizedImage(originalImage, size.getPixels(), horizontalSize);
+            BufferedImage resizedImage = getResizedImage(originalImage, size.getPixels(), horizontalSize);
 
-        ImageIO.write(resizedImage, format, out);
+            ImageIO.write(resizedImage, format, out);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new UtilityServiceException("can't resize image", e);
+        }
 
         return out.toByteArray();
     }

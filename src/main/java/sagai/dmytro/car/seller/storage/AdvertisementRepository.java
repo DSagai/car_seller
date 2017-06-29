@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: add comments
+ * TODO: add comments, implement filter getAdvertisements methods
  *
  * @author dsagai
  * @version TODO: set version
@@ -35,15 +35,13 @@ public class AdvertisementRepository {
     public AdvertisementRepository() {
     }
 
-    public SessionFactory getFactory() {
-        return factory;
-    }
 
-    public void setFactory(SessionFactory factory) {
-        this.factory = factory;
-    }
-
-    public void saveUpdateAdvertisement(Advertisement advertisement){
+    /**
+     * method adds new advertisement to the database or updates existing one.
+     * @param advertisement Advertisement.
+     * @throws StorageException
+     */
+    public void saveUpdateAdvertisement(Advertisement advertisement) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -51,15 +49,20 @@ public class AdvertisementRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
-
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("advertisement save/update was unsuccessful", e);
         } finally {
             session.close();
         }
 
     }
 
-    public void removeAdvertisement(Advertisement advertisement) {
+    /**
+     * method removes advertisement from database.
+     * @param advertisement Advertisement.
+     * @throws StorageException
+     */
+    public void removeAdvertisement(Advertisement advertisement) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
 
@@ -68,13 +71,19 @@ public class AdvertisementRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("advertisement remove was unsuccessful", e);
         } finally {
             session.close();
         }
     }
 
-    public List<Advertisement> getAdvertisements(Criterion criterion) {
+    /**
+     * TODO
+     * @param criterion
+     * @return
+     */
+    public List<Advertisement> getAdvertisements(Criterion criterion) throws StorageException {
         Session session = this.factory.openSession();
         Criteria criteria = session.createCriteria(Advertisement.class);
         criteria.add(criterion);
@@ -83,7 +92,8 @@ public class AdvertisementRepository {
         try {
             criteria.list();
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can not retrieve advertisements from database", e);
         } finally {
             session.close();
         }
@@ -91,22 +101,34 @@ public class AdvertisementRepository {
         return result;
     }
 
-    public List<Advertisement> getAdvertisements() {
+    /**
+     * TODO
+     * @return
+     */
+    public List<Advertisement> getAdvertisements() throws StorageException {
         List<Advertisement> result = new ArrayList<>();
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
             result = session.createQuery("from Advertisement ").list();
         } catch (Exception e) {
-            e.printStackTrace();
             transaction.rollback();
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can not retrieve advertisements from database", e);
+
         } finally {
             session.close();
         }
         return result;
     }
 
-    public Advertisement getAdvertisement(int id) {
+    /**
+     * method retrieves advertisement from the database by id.
+     * @param id int.
+     * @return Advertisement.
+     * @throws StorageException
+     */
+    public Advertisement getAdvertisement(int id) throws StorageException {
         Advertisement advertisement = null;
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -114,8 +136,9 @@ public class AdvertisementRepository {
             advertisement = session.get(Advertisement.class, id);
             transaction.commit();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+            transaction.rollback();
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can not retrieve advertisement from database", e);
         } finally {
             session.close();
         }

@@ -1,5 +1,7 @@
 package sagai.dmytro.car.seller.storage;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -12,14 +14,16 @@ import javax.inject.Named;
 import java.util.UUID;
 
 /**
- * TODO: add comments
+ * Repository for User class.
  *
  * @author dsagai
- * @version TODO: set version
+ * @version 1.00
  * @since 26.04.2017
  */
 @Repository("userRepository")
 public class UserRepository {
+    private static final Logger LOGGER = Logger.getLogger(UserRepository.class);
+
     public static final String DUPLICATE_EMAIL = "DUPLICATE_EMAIL";
     public static final String DUPLICATE_LOGIN = "DUPLICATE_LOGIN";
 
@@ -34,7 +38,12 @@ public class UserRepository {
     public UserRepository() {
     }
 
-    public void addUser(User user) {
+    /**
+     * method adds user into database.
+     * @param user User.
+     * @throws StorageException
+     */
+    public void addUser(User user) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try{
@@ -44,13 +53,20 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't add user into database", e);
         } finally {
             session.close();
         }
     }
 
-    public User getUser(int id) {
+    /**
+     * method retrieves user by id.
+     * @param id
+     * @return
+     * @throws StorageException
+     */
+    public User getUser(int id) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         User user = null;
@@ -59,14 +75,21 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't retrieve user for id = " + id, e);
         } finally {
             session.close();
         }
         return user;
     }
 
-    public User getUser(String login) {
+    /**
+     * method retrieves user by login.
+     * @param login
+     * @return User.
+     * @throws StorageException
+     */
+    public User getUser(String login) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         User user = null;
@@ -76,14 +99,21 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't retrieve user for login = " + login, e);
         } finally {
             session.close();
         }
         return user;
     }
 
-    public User getUser(UUID uuid) {
+    /**
+     * Method retrieves user by UUID.
+     * @param uuid UUID.
+     * @return User.
+     * @throws StorageException
+     */
+    public User getUser(UUID uuid) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         User user = null;
@@ -93,14 +123,20 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't retrieve user for uuid = " + uuid, e);
         } finally {
             session.close();
         }
         return user;
     }
 
-    public void updateUser(User user) {
+    /**
+     * method updates an existing user.
+     * @param user User.
+     * @throws StorageException
+     */
+    public void updateUser(User user) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -108,13 +144,19 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't update user", e);
         } finally {
             session.close();
         }
     }
 
-    public void removeUser(User user) {
+    /**
+     * method removes user from database.
+     * @param user User.
+     * @throws StorageException
+     */
+    public void removeUser(User user) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try{
@@ -122,13 +164,23 @@ public class UserRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't remove user", e);
         } finally {
             session.close();
         }
     }
 
-    public String checkDuplicates(User user) {
+    /**
+     * Method checks duplicate for requested user in database.
+     * Requested user has to have unique values for fields: login and email.
+     * Method is used for add-user form verification.
+     * @param user User.
+     * @return String check result: empty string, if no duplicates were found, or an error message
+     * if duplicate was found.
+     * @throws StorageException
+     */
+    public String checkDuplicates(User user) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         String result = "";
@@ -147,7 +199,8 @@ public class UserRepository {
 
         } catch (Exception e) {
             transaction.rollback();
-            throw e;
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("some error happened during duplicate check", e);
         } finally {
             session.close();
         }

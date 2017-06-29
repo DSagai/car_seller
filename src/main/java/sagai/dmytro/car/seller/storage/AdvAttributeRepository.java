@@ -33,15 +33,12 @@ public class AdvAttributeRepository {
     public AdvAttributeRepository() {
     }
 
-    public SessionFactory getFactory() {
-        return factory;
-    }
-
-    public void setFactory(SessionFactory factory) {
-        this.factory = factory;
-    }
-
-    public void saveUpdateAttribute(AdvAttribute advAttribute) {
+    /**
+     * method saves or updates advAttribute into database.
+     * @param advAttribute AdvAttribute.
+     * @throws StorageException
+     */
+    public void saveUpdateAttribute(AdvAttribute advAttribute) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -49,12 +46,17 @@ public class AdvAttributeRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can not save or update attribute", e);
         }
     }
 
-
-    public void removeAttribute(AdvAttribute advAttribute) {
+    /**
+     * method removes AdvAttribute from data base.
+     * @param advAttribute AdvAttribute.
+     * @throws StorageException
+     */
+    public void removeAttribute(AdvAttribute advAttribute) throws StorageException {
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
         try {
@@ -62,11 +64,18 @@ public class AdvAttributeRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can not remove attribute from database", e);
         }
     }
 
-    public List<AdvAttribute> getAttributesByType(AttributeTypes type) {
+    /**
+     * method retrieves advertisement attributes by type.
+     * @param type AttributeTypes.
+     * @return List of AdvAttribute.
+     * @throws StorageException
+     */
+    public List<AdvAttribute> getAttributesByType(AttributeTypes type) throws StorageException {
         List<AdvAttribute> result = new ArrayList<>();
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -76,14 +85,21 @@ public class AdvAttributeRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't retrieve attributes of type " + type.name(), e);
         } finally {
             session.close();
         }
         return result;
     }
 
-    public AdvAttribute getAttributeByName(String attributeName) {
+    /**
+     * method retrieves attribute from database by attribute name.
+     * @param attributeName String.
+     * @return AdvAttribute.
+     * @throws StorageException
+     */
+    public AdvAttribute getAttributeByName(String attributeName) throws StorageException {
         AdvAttribute result = null;
         Session session = this.factory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -93,14 +109,20 @@ public class AdvAttributeRepository {
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
-            LOGGER.log(Level.INFO, e.getMessage());
+            LOGGER.log(Level.WARN, e);
+            throw new StorageException("can't retrieve attribute by name=" + attributeName, e);
         } finally {
             session.close();
         }
         return result;
     }
 
-    public AdvAttribute getDefaultStatus() {
+    /**
+     * method retrieves from database an attribute which represents default advertisement status.
+     * @return AdvAttribute default advertisement status.
+     * @throws StorageException
+     */
+    public AdvAttribute getDefaultStatus() throws StorageException {
         return getAttributeByName(DEFAULT_STATUS_NAME);
     }
 }

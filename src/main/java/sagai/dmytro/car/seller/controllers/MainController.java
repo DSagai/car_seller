@@ -3,6 +3,8 @@ package sagai.dmytro.car.seller.controllers;
 
 
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,7 @@ import sagai.dmytro.car.seller.model.advertisements.Advertisement;
 import sagai.dmytro.car.seller.model.advertisements.AlbumItem;
 import sagai.dmytro.car.seller.model.advertisements.attributes.AttributeTypes;
 import sagai.dmytro.car.seller.model.authentication.User;
-import sagai.dmytro.car.seller.storage.AdvAttributeRepository;
-import sagai.dmytro.car.seller.storage.AdvertisementRepository;
-import sagai.dmytro.car.seller.storage.AlbumItemsRepository;
-import sagai.dmytro.car.seller.storage.UserRepository;
+import sagai.dmytro.car.seller.storage.*;
 import sagai.dmytro.car.seller.utility.ImageConverterService;
 
 
@@ -41,6 +40,7 @@ import java.util.List;
  */
 @Controller
 public class MainController {
+    private static final Logger LOGGER = Logger.getLogger(MainController.class);
 
     @Autowired
     @Named("advAttributeRepository")
@@ -80,20 +80,16 @@ public class MainController {
 
 
     /**
-     * todo comments
-     * @param picture
-
-     * @return
-     * @throws IOException
-     * @throws FileUploadException
+     * method processes albumItems upload.
+     * @param picture MultipartFile
+     * @return ResponseEntity.
      */
     @RequestMapping(value = "/upload-album-item",
             consumes = "multipart/form-data",
             method = RequestMethod.POST)
 
     public ResponseEntity<Integer> uploadAlbumItem(@RequestPart("picture") MultipartFile picture,
-                                              @RequestParam int id, Principal login
-    ) throws IOException, FileUploadException {
+                                              @RequestParam int id, Principal login) {
 
         int body = 0;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
@@ -110,27 +106,31 @@ public class MainController {
             body = albumItem.getId();
             httpStatus = HttpStatus.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARN, e);
         }
 
         return new ResponseEntity<Integer>(body, httpStatus);
     }
 
     @RequestMapping("/add-advertisement-form")
-    public ModelAndView getAddAdvForm() {
-        ModelAndView mv = new ModelAndView("adv-add");
-        mv.addObject("manufacturerList",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
-        mv.addObject("engineType",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.EngineType));
-        mv.addObject("carBodyType",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.CarBodyType));
-        mv.addObject("transmission",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
+    public ModelAndView getAddAdvForm() throws ControllerException {
+        try {
+            ModelAndView mv = new ModelAndView("adv-add");
+            mv.addObject("manufacturerList",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
+            mv.addObject("engineType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.EngineType));
+            mv.addObject("carBodyType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.CarBodyType));
+            mv.addObject("transmission",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
 
-
-        mv.addObject("advertisement", new Advertisement());
-        return mv;
+            mv.addObject("advertisement", new Advertisement());
+            return mv;
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("can't initiate add-advertisement form");
+        }
     }
 
     @RequestMapping(value = "/ADD-ADVERTISEMENT",
@@ -138,39 +138,54 @@ public class MainController {
     )
     public String addAdvertisement(@ModelAttribute Advertisement advertisement,
                                    Principal user,
-                                   RedirectAttributes attributes) {
-        advertisement.setStatus(this.advAttributeRepository.getDefaultStatus());
-        advertisement.setOwner(this.userRepository.getUser(user.getName()));
-        advertisement.setCreated(new Timestamp(System.currentTimeMillis()));
-        this.advertisementRepository.saveUpdateAdvertisement(advertisement);
+                                   RedirectAttributes attributes) throws ControllerException {
+        try {
+            advertisement.setStatus(this.advAttributeRepository.getDefaultStatus());
+            advertisement.setOwner(this.userRepository.getUser(user.getName()));
+            advertisement.setCreated(new Timestamp(System.currentTimeMillis()));
+            this.advertisementRepository.saveUpdateAdvertisement(advertisement);
 
-        attributes.addAttribute("advId", advertisement.getId());
-        return "redirect:/update-advertisement-form";
+            attributes.addAttribute("advId", advertisement.getId());
+            return "redirect:/update-advertisement-form";
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("add advertisement operation  failed", e);
+        }
     }
 
     @RequestMapping(value = "/update-advertisement-form")
-    public ModelAndView getUpdateAdvForm(@RequestParam int advId, Principal login) {
-        ModelAndView mv = new ModelAndView("adv-update");
-        Advertisement advertisement = this.advertisementRepository.getAdvertisement(advId);
+    public ModelAndView getUpdateAdvForm(@RequestParam int advId, Principal login) throws ControllerException {
+        try {
+            ModelAndView mv = new ModelAndView("adv-update");
+            Advertisement advertisement = this.advertisementRepository.getAdvertisement(advId);
 
-        checkOwnership(advertisement.getOwner(), login);
+            checkOwnership(advertisement.getOwner(), login);
 
-        mv.addObject("manufacturerList",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
-        mv.addObject("engineType",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.EngineType));
-        mv.addObject("carBodyType",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.CarBodyType));
-        mv.addObject("transmission",
-                this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
-        mv.addObject("advertisement", advertisement);
-        return mv;
+            mv.addObject("manufacturerList",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
+            mv.addObject("engineType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.EngineType));
+            mv.addObject("carBodyType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.CarBodyType));
+            mv.addObject("transmission",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
+            mv.addObject("advertisement", advertisement);
+            return mv;
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("can't initiate update-advertisement form", e);
+        }
     }
 
     @RequestMapping(value = "/get-album-list", method = RequestMethod.POST)
     @ResponseBody
-    public Integer[] getAlbumList(@ModelAttribute Advertisement advertisement) {
-        return this.albumItemsRepository.getAlbumItemIdArray(advertisement);
+    public Integer[] getAlbumList(@ModelAttribute Advertisement advertisement) throws ControllerException {
+        try {
+            return this.albumItemsRepository.getAlbumItemIdArray(advertisement);
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("process of albumItem list failed");
+        }
     }
 
 
@@ -180,11 +195,16 @@ public class MainController {
      */
     @RequestMapping("/UPDATE-ADVERTISEMENT")
     public String updateAdvertisement(@ModelAttribute Advertisement advertisement,
-                                      RedirectAttributes attributes, Principal login) {
-        checkOwnership(this.userRepository.getUser(advertisement.getOwner().getId()), login);
-        this.advertisementRepository.saveUpdateAdvertisement(advertisement);
-        attributes.addAttribute("advId", advertisement.getId());
-        return "redirect:/update-advertisement-form";
+                                      RedirectAttributes attributes, Principal login) throws ControllerException {
+        try {
+            checkOwnership(this.userRepository.getUser(advertisement.getOwner().getId()), login);
+            this.advertisementRepository.saveUpdateAdvertisement(advertisement);
+            attributes.addAttribute("advId", advertisement.getId());
+            return "redirect:/update-advertisement-form";
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("update advertisement process failed", e);
+        }
     }
 
 //    @RequestMapping(value = "/sketchPhoto.jpg", method = RequestMethod.GET)
@@ -205,13 +225,18 @@ public class MainController {
 
     @RequestMapping(value = "/albumItem.jpg", method = RequestMethod.GET)
     @ResponseBody
-    public byte[] getAlbumItem(@RequestParam int id) {
-        AlbumItem albumItem = this.albumItemsRepository.getAlbumItem(id);
-        byte[] result = null;
-        if (albumItem != null) {
-            result = albumItem.getPhoto();
+    public byte[] getAlbumItem(@RequestParam int id) throws ControllerException {
+        try {
+            AlbumItem albumItem = this.albumItemsRepository.getAlbumItem(id);
+            byte[] result = null;
+            if (albumItem != null) {
+                result = albumItem.getPhoto();
+            }
+            return result;
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("can't provide picture link", e);
         }
-        return result;
     }
 
 
@@ -225,8 +250,8 @@ public class MainController {
             this.albumItemsRepository.removeAlbumItem(albumItem);
             body = albumItem.getId();
             httpStatus = HttpStatus.OK;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
         }
 
         return new ResponseEntity<Integer>(body, httpStatus);
@@ -247,14 +272,24 @@ public class MainController {
         }
     }
 
-
+    /**
+     * process
+     * @param id
+     * @return
+     * @throws ControllerException
+     */
     @RequestMapping("/view-adv-form")
-    public ModelAndView getViewAdvForm(@RequestParam int id) {
-        ModelAndView mv = new ModelAndView("adv-view");
-        Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
-        mv.addObject("advertisement", advertisement);
-        mv.addObject("albumItems", this.albumItemsRepository.getAlbumItemIdArray(advertisement));
-        return mv;
+    public ModelAndView getViewAdvForm(@RequestParam int id) throws ControllerException {
+        try {
+            ModelAndView mv = new ModelAndView("adv-view");
+            Advertisement advertisement = this.advertisementRepository.getAdvertisement(id);
+            mv.addObject("advertisement", advertisement);
+            mv.addObject("albumItems", this.albumItemsRepository.getAlbumItemIdArray(advertisement));
+            return mv;
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("can't initiate view-adv form", e);
+        }
     }
 
 }
