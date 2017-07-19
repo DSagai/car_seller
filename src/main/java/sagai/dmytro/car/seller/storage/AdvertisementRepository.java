@@ -3,25 +3,28 @@ package sagai.dmytro.car.seller.storage;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.Criteria;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
+
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import sagai.dmytro.car.seller.model.advertisements.Advertisement;
+
 
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * TODO: add comments, implement filter getAdvertisements methods
+ * Repository of Advertisements.
  *
  * @author dsagai
- * @version TODO: set version
+ * @version 1.00
  * @since 25.04.2017
  */
 @Repository("advertisementRepository")
@@ -78,32 +81,49 @@ public class AdvertisementRepository {
         }
     }
 
-    /**
-     * TODO
-     * @param criterion
-     * @return
-     */
-    public List<Advertisement> getAdvertisements(Criterion criterion) throws StorageException {
-        Session session = this.factory.openSession();
-        Criteria criteria = session.createCriteria(Advertisement.class);
-        criteria.add(criterion);
 
+    /**
+     * Method returns list of Advertisements as response on search request with
+     * custom filter (list of SearchAdvParam).
+     * @param params SearchAdvParam list
+     * @return List<Advertisement>
+     * @throws StorageException
+     */
+    public List<Advertisement> getAdvertisements(List<SearchAdvParam> params) throws StorageException {
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
         List<Advertisement> result = new ArrayList<>();
         try {
-            criteria.list();
+            StringBuilder stringBuilder = new StringBuilder("from Advertisement where ");
+            for (SearchAdvParam searchAdvParam : params) {
+                stringBuilder.append(String.format(" %s %s :%s and", searchAdvParam.getFieldName(),
+                        searchAdvParam.getRestriction().getRestriction(),
+                        searchAdvParam.getFieldName()));
+            }
+            stringBuilder.replace(stringBuilder.length() - 3, stringBuilder.length(), "");
+            Query query = session.createQuery(stringBuilder.toString());
+            for (SearchAdvParam searchAdvParam : params) {
+                query.setParameter(searchAdvParam.getFieldName(), searchAdvParam.getSearchParamObject());
+            }
+            result = query.list();
+            transaction.commit();
         } catch (Exception e) {
+            transaction.rollback();
             LOGGER.log(Level.WARN, e);
-            throw new StorageException("can not retrieve advertisements from database", e);
+            throw new StorageException("can't execute query", e);
         } finally {
             session.close();
         }
-
         return result;
     }
 
+
+
+
     /**
-     * TODO
-     * @return
+     * Method returns all Advertisements containing in database.
+     * @return List<Advertisement>
+     * @throws StorageException
      */
     public List<Advertisement> getAdvertisements() throws StorageException {
         List<Advertisement> result = new ArrayList<>();
@@ -143,5 +163,25 @@ public class AdvertisementRepository {
             session.close();
         }
         return advertisement;
+    }
+
+    public List<Advertisement> test(SearchAdvParam searchAdvParam) {
+        Session session = this.factory.openSession();
+        Transaction transaction = session.beginTransaction();
+        List<Advertisement> result = new ArrayList<>();
+        try {
+            StringBuilder stringBuilder = new StringBuilder("from Advertisement where ");
+            stringBuilder.append(String.format(" %s %s :%s ", searchAdvParam.getFieldName(),
+                    searchAdvParam.getRestriction().getRestriction(),
+                    searchAdvParam.getFieldName()));
+            result = session.createQuery(stringBuilder.toString())
+                    .setParameter(searchAdvParam.getFieldName(), searchAdvParam.getSearchParamObject()).list();
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+        } finally {
+            session.close();
+        }
+        return result;
     }
 }

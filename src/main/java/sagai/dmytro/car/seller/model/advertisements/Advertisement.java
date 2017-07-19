@@ -1,6 +1,7 @@
 package sagai.dmytro.car.seller.model.advertisements;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.validator.constraints.Range;
 import sagai.dmytro.car.seller.model.advertisements.attributes.AdvAttribute;
 import sagai.dmytro.car.seller.model.authentication.User;
@@ -29,6 +30,7 @@ public class Advertisement {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", nullable = false, foreignKey = @ForeignKey(name = "OWNER_ID_FK"))
+    @JsonIgnore
     private User owner;
 
     @Basic
@@ -80,7 +82,7 @@ public class Advertisement {
     @Basic
     @Column(name = "year_produced", nullable = false)
     @NotNull(message = "This field could not be empty.")
-    @Range(min = 1900, max = 2017, message = "value is out of allowed range between 1900 and 2050")
+    @Range(min = 1900, max = 2030, message = "value is out of allowed range between 1900 and 2050")
     private int yearOfProduction;
 
     @Basic
@@ -102,7 +104,7 @@ public class Advertisement {
     @NotNull(message = "This field could not be empty.")
     private float sellPrice;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(name = "messages", joinColumns = @JoinColumn(name = "advertisement_id"),
     inverseJoinColumns = @JoinColumn(name = "id"))
     private List<Message> messages;

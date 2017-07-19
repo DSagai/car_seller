@@ -2,6 +2,7 @@ package sagai.dmytro.car.seller.controllers;
 
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -25,7 +26,7 @@ import sagai.dmytro.car.seller.utility.ImageConverterService;
 
 import javax.inject.Named;
 import javax.servlet.ServletContext;
-import java.io.IOException;
+import java.io.StringReader;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.util.List;
 @Controller
 public class MainController {
     private static final Logger LOGGER = Logger.getLogger(MainController.class);
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
     @Autowired
     @Named("advAttributeRepository")
@@ -68,8 +70,22 @@ public class MainController {
     private ImageConverterService imageConverterService;
 
     @RequestMapping("/")
-    public String advertisementList() {
-        return "adv-list";
+    public ModelAndView advertisementList() throws ControllerException {
+        try {
+            ModelAndView mv = new ModelAndView("adv-list");
+            mv.addObject("manufacturerList",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Manufacturer));
+            mv.addObject("engineType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.EngineType));
+            mv.addObject("carBodyType",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.CarBodyType));
+            mv.addObject("transmission",
+                    this.advAttributeRepository.getAttributesByType(AttributeTypes.Transmission));
+            return mv;
+        } catch (StorageException e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("Can't initialize adv-list form. Can't retrieve form attributes.", e);
+        }
     }
 
 
@@ -129,7 +145,7 @@ public class MainController {
             return mv;
         } catch (StorageException e) {
             LOGGER.log(Level.WARN, e);
-            throw new ControllerException("can't initiate add-advertisement form");
+            throw new ControllerException("can't initiate add-advertisement form", e);
         }
     }
 
@@ -184,7 +200,7 @@ public class MainController {
             return this.albumItemsRepository.getAlbumItemIdArray(advertisement);
         } catch (StorageException e) {
             LOGGER.log(Level.WARN, e);
-            throw new ControllerException("process of albumItem list failed");
+            throw new ControllerException("process of albumItem list failed", e);
         }
     }
 
@@ -289,6 +305,20 @@ public class MainController {
         } catch (StorageException e) {
             LOGGER.log(Level.WARN, e);
             throw new ControllerException("can't initiate view-adv form", e);
+        }
+    }
+
+
+    @RequestMapping(value = "/getAdvList")
+    @ResponseBody
+    public List<Advertisement> getAdvertisementList(@RequestParam String searchParams) throws ControllerException {
+        try {
+            List<SearchAdvParam> paramList = this.jsonMapper.readValue(new StringReader(searchParams),
+                    this.jsonMapper.getTypeFactory().constructCollectionType(List.class, SearchAdvParam.class));
+            return this.advertisementRepository.getAdvertisements(paramList);
+        } catch (Exception e) {
+            LOGGER.log(Level.WARN, e);
+            throw new ControllerException("can't apply advertisement search filter", e);
         }
     }
 

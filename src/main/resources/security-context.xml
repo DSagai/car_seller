@@ -28,9 +28,9 @@
         <security:intercept-url pattern="/albumItem.jpg" access="permitAll"/>
         <security:intercept-url pattern="/get-album-list" access="permitAll"/>
         <security:intercept-url pattern="/view-adv-form" access="permitAll"/>
+        <security:intercept-url pattern="/getAdvList" access="permitAll"/>
+        <security:intercept-url pattern="/" access="permitAll"/>
 
-
-        <security:intercept-url pattern="/" access="isAuthenticated()"/>
         <security:intercept-url pattern="/add-advertisement-form" access="isAuthenticated()"/>
         <security:intercept-url pattern="/ADD-ADVERTISEMENT" access="isAuthenticated()"/>
         <security:intercept-url pattern="/update-advertisement-form" access="isAuthenticated()"/>

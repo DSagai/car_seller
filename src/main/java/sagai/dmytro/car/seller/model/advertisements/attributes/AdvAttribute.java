@@ -14,6 +14,19 @@ import javax.persistence.*;
 @Table(name = "attributes")
 public class AdvAttribute {
 
+    /**
+     * method returns instance of AdvAttribute with id property
+     * determined from String param.
+     * @param stringId String.
+     * @return AdvAttribute.
+     */
+    public static AdvAttribute getInstanceByString(String stringId) {
+        int id = Integer.parseInt(stringId);
+        AdvAttribute attribute = new AdvAttribute();
+        attribute.setId(id);
+        return attribute;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -68,6 +81,7 @@ public class AdvAttribute {
                 '}';
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -75,18 +89,11 @@ public class AdvAttribute {
 
         AdvAttribute attribute = (AdvAttribute) o;
 
-        if (id != attribute.id) return false;
-        if (type != attribute.type) return false;
-        return name.equals(attribute.name);
+        return id == attribute.id;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + type.hashCode();
-        result = 31 * result + name.hashCode();
-        return result;
+        return id;
     }
-
-
 }
